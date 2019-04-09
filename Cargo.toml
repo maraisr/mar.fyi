@@ -1,0 +1,16 @@
+[package]
+name = "youre-real-short"
+version = "0.0.1"
+
+[profile.release]
+lto = true
+panic = "abort"
+
+[[bin]]
+name = "index"
+path = "index.rs"
+
+[dependencies]
+http = "*"
+lambda_runtime = "*"
+
