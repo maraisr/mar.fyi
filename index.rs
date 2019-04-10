@@ -1,21 +1,30 @@
 extern crate actix_web;
+extern crate env_logger;
+extern crate log;
 
 use std::collections::HashMap;
 
-use actix_web::{actix, App, http, HttpResponse, Path, server};
+use actix_web::{actix, http, server, App, HttpResponse, Path};
 
 static LISTEN_ON: &'static str = "0.0.0.0:8080";
 
 fn main() {
+    env_logger::init_from_env(
+        env_logger::Env::default()
+            .filter_or("LOG_LEVEL", "app=debug")
+        );
+
     let sys = actix::System::new("app");
 
-    server::new(
-        || App::new()
-            .route("/{slug}", http::Method::GET, handler))
-        .bind(LISTEN_ON).unwrap()
+    server::new(|| {
+            App::new()
+                .route("/{slug}", http::Method::GET, handler)
+		})
+        .bind(LISTEN_ON)
+        .unwrap()
         .start();
 
-    println!("🚀 Started server on: {}", LISTEN_ON);
+    log::info!("🚀 Started server on: {}", LISTEN_ON);
 
     sys.run();
 }
@@ -29,16 +38,18 @@ fn handler(slug: Path<String>) -> HttpResponse {
     }
 
     if let Some(point_to) = map.get(&slug[..]) {
-        println!("⚡️ Found: {}, sending: {}", slug, *point_to);
+        log::info!("⚡️ Found: {}, sending: {}", slug, *point_to);
 
         return HttpResponse::Found()
             .header(http::header::LOCATION, *point_to)
-            .header(http::header::CACHE_CONTROL, "public, s-maxage=43200, maxage=43200")
+            .header(
+                http::header::CACHE_CONTROL,
+                "public, s-maxage=43200, maxage=43200",
+            )
             .finish();
     } else {
-        println!("🤔 Asking for: {}", slug);
+        log::info!("🤔 Asking for: {}", slug);
     }
 
-    HttpResponse::NotFound()
-        .finish()
+    HttpResponse::NotFound().finish()
 }
