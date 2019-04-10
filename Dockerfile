@@ -3,9 +3,8 @@ FROM rust:latest as BUILDER
 RUN rustup target add x86_64-unknown-linux-musl
 RUN apt-get update
 RUN apt-get install -y \
-    build-essential \
     musl-dev \
-    musl-tools
+	musl-tools
 
 WORKDIR /app
 
