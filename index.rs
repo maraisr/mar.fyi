@@ -31,11 +31,8 @@ fn main() {
 
 fn handler(slug: Path<String>) -> HttpResponse {
     let mut map: HashMap<&'static str, &'static str> = HashMap::new();
-    map.insert("twitter", "https://www.twitter.com");
-
-    if cfg!(test) {
-        map.insert("test", "test");
-    }
+    map.insert("twitter", "https://twitter.com/codervandal");
+    map.insert("github", "https://github.com/maraisr");
 
     if let Some(point_to) = map.get(&slug[..]) {
         log::info!("⚡️ Found: {}, sending: {}", slug, *point_to);
