@@ -4,7 +4,7 @@ extern crate log;
 
 use std::collections::HashMap;
 
-use actix_web::{actix, http, server, App, HttpResponse, Path};
+use actix_web::{actix, App, http, HttpResponse, Path, server};
 
 static LISTEN_ON: &'static str = "0.0.0.0:8080";
 
@@ -12,14 +12,14 @@ fn main() {
     env_logger::init_from_env(
         env_logger::Env::default()
             .filter_or("LOG_LEVEL", "app=debug")
-        );
+    );
 
     let sys = actix::System::new("app");
 
     server::new(|| {
-            App::new()
-                .route("/{slug}", http::Method::GET, handler)
-		})
+        App::new()
+            .route("/{slug}", http::Method::GET, handler)
+    })
         .bind(LISTEN_ON)
         .unwrap()
         .start();
@@ -41,9 +41,13 @@ fn handler(slug: Path<String>) -> HttpResponse {
             .header(http::header::LOCATION, *point_to)
             .header(
                 http::header::CACHE_CONTROL,
-                "public, s-maxage=43200, maxage=43200",
+                "public, s-maxage=43200, max-age=43200, must-revalidate",
             )
-            .finish();
+            .header(
+                http::header::CONTENT_TYPE,
+                "content-type: text/plain; charset=utf-8",
+            )
+            .body(format!("⚡️ Zapping you over to: {}", *point_to));
     } else {
         log::info!("🤔 Asking for: {}", slug);
     }
