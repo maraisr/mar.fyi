@@ -1,6 +1,4 @@
-extern crate env_logger;
 extern crate http;
-extern crate log;
 
 use std::collections::HashMap;
 
@@ -18,7 +16,7 @@ fn handler(request: Request<()>) -> http::Result<Response<String>> {
     let uri = &request.uri().path()[1..];
 
     if let Some(point_to) = map.get(&uri) {
-        log::info!("⚡️ Found: {}, sending: {}", uri, *point_to);
+        println!("⚡️ Found: {}, sending: {}", uri, *point_to);
 
         return Response::builder()
             .status(StatusCode::FOUND)
@@ -33,7 +31,7 @@ fn handler(request: Request<()>) -> http::Result<Response<String>> {
             )
             .body(format!("⚡️ Zapping you over to: {}", *point_to));
     } else {
-        log::info!("🤔 Asking for: {}", uri);
+        println!("🤔 Asking for: {}", uri);
     }
 
     Response::builder()

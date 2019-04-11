@@ -14,5 +14,3 @@ path = "index.rs"
 
 [dependencies]
 http = "*"
-log = "~0.4"
-env_logger = "*"
