@@ -23,7 +23,7 @@ fn handler(request: Request<()>) -> http::Result<Response<String>> {
             .header(header::LOCATION, *point_to)
             .header(
                 header::CACHE_CONTROL,
-                "public, s-maxage=43200, max-age=43200, must-revalidate",
+                "public, s-maxage=43200, max-age=43200, stale-while-revalidate",
             )
             .header(
                 header::CONTENT_TYPE,
@@ -35,10 +35,10 @@ fn handler(request: Request<()>) -> http::Result<Response<String>> {
     }
 
     Response::builder()
-        .status(StatusCode::NOT_FOUND)
+        .status(StatusCode::OK)
         .header(
             header::CACHE_CONTROL,
-            "public, s-maxage=7200, max-age=0, must-revalidate",
+            "public, s-maxage=7200, max-age=0, stale-while-revalidate",
         )
         .header(
             header::CONTENT_TYPE,
@@ -77,7 +77,7 @@ mod test {
     }
 
     #[test]
-    fn it_should_404() {
+    fn it_should_200() {
         let resp = handler(
             Request::builder()
                 .uri("/abc123")
@@ -85,7 +85,7 @@ mod test {
                 .unwrap()
         );
 
-        assert_eq!(resp.unwrap().status(), StatusCode::NOT_FOUND);
+        assert_eq!(resp.unwrap().status(), StatusCode::OK);
     }
 
     #[test]
