@@ -1,56 +1,96 @@
-extern crate actix_web;
 extern crate env_logger;
+extern crate http;
 extern crate log;
 
 use std::collections::HashMap;
 
-use actix_web::{actix, App, http, HttpResponse, Path, server};
+use http::{header, Request, Response, StatusCode};
 
-static LISTEN_ON: &'static str = "0.0.0.0:8080";
-
-fn main() {
-    env_logger::init_from_env(
-        env_logger::Env::default()
-            .filter_or("LOG_LEVEL", "app=debug")
-    );
-
-    let sys = actix::System::new("app");
-
-    server::new(|| {
-        App::new()
-            .route("/{slug}", http::Method::GET, handler)
-    })
-        .bind(LISTEN_ON)
-        .unwrap()
-        .start();
-
-    log::info!("🚀 Started server on: {}", LISTEN_ON);
-
-    sys.run();
-}
-
-fn handler(slug: Path<String>) -> HttpResponse {
+fn handler(request: Request<()>) -> http::Result<Response<String>> {
     let mut map: HashMap<&'static str, &'static str> = HashMap::new();
     map.insert("twitter", "https://twitter.com/codervandal");
     map.insert("github", "https://github.com/maraisr");
 
-    if let Some(point_to) = map.get(&slug[..]) {
-        log::info!("⚡️ Found: {}, sending: {}", slug, *point_to);
+    if cfg!(test) {
+        map.insert("test_key", "test_url");
+    }
 
-        return HttpResponse::Found()
-            .header(http::header::LOCATION, *point_to)
+    let uri = &request.uri().path()[1..];
+
+    if let Some(point_to) = map.get(&uri) {
+        log::info!("⚡️ Found: {}, sending: {}", uri, *point_to);
+
+        return Response::builder()
+            .status(StatusCode::FOUND)
+            .header(header::LOCATION, *point_to)
             .header(
-                http::header::CACHE_CONTROL,
+                header::CACHE_CONTROL,
                 "public, s-maxage=43200, max-age=43200, must-revalidate",
             )
             .header(
-                http::header::CONTENT_TYPE,
+                header::CONTENT_TYPE,
                 "content-type: text/plain; charset=utf-8",
             )
             .body(format!("⚡️ Zapping you over to: {}", *point_to));
     } else {
-        log::info!("🤔 Asking for: {}", slug);
+        log::info!("🤔 Asking for: {}", uri);
     }
 
-    HttpResponse::NotFound().finish()
+    Response::builder()
+        .status(StatusCode::NOT_FOUND)
+        .body(format!("❌ Nothing here to see..."))
+}
+
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn it_should_work() {
+        let resp = handler(
+            Request::builder()
+                .uri("/test_key")
+                .body(())
+                .unwrap()
+        );
+
+        assert_eq!(resp.unwrap().status(), StatusCode::FOUND);
+    }
+
+    #[test]
+    fn it_should_have_location_header() {
+        let resp = handler(
+            Request::builder()
+                .uri("/test_key")
+                .body(())
+                .unwrap()
+        );
+
+        assert_eq!(resp.unwrap().headers().get(header::LOCATION).is_some(), true);
+    }
+
+    #[test]
+    fn it_should_404() {
+        let resp = handler(
+            Request::builder()
+                .uri("/abc123")
+                .body(())
+                .unwrap()
+        );
+
+        assert_eq!(resp.unwrap().status(), StatusCode::NOT_FOUND);
+    }
+
+    #[test]
+    fn it_should_at_least_match_twitter() {
+        let resp = handler(
+            Request::builder()
+                .uri("/twitter")
+                .body(())
+                .unwrap()
+        );
+
+        assert_eq!(resp.unwrap().status(), StatusCode::FOUND);
+    }
 }

@@ -1,0 +1,11 @@
+{
+  "name": "mar.fyi",
+  "version": 2,
+  "alias": "https://mar.fyi/",
+  "builds": [
+    {
+      "src": "index.rs",
+      "use": "@now/rust"
+    }
+  ]
+}

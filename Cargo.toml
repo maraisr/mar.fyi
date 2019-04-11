@@ -13,6 +13,6 @@ name = "app"
 path = "index.rs"
 
 [dependencies]
-actix-web = "*"
+http = "*"
 log = "~0.4"
 env_logger = "*"
