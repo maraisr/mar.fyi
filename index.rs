@@ -36,6 +36,14 @@ fn handler(request: Request<()>) -> http::Result<Response<String>> {
 
     Response::builder()
         .status(StatusCode::NOT_FOUND)
+        .header(
+            header::CACHE_CONTROL,
+            "public, s-maxage=7200, max-age=0, must-revalidate",
+        )
+        .header(
+            header::CONTENT_TYPE,
+            "content-type: text/plain; charset=utf-8",
+        )
         .body(format!("❌ Nothing here to see..."))
 }
 
