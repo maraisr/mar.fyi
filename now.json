@@ -9,7 +9,7 @@
   ],
   "routes": [
     {
-      "src": "/.+",
+      "src": "/[a-z]+",
       "dest": "/index.rs"
     }
   ]

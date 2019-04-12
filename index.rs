@@ -35,7 +35,7 @@ fn handler(request: Request<()>) -> http::Result<Response<String>> {
     }
 
     Response::builder()
-        .status(StatusCode::OK)
+        .status(StatusCode::NOT_FOUND)
         .header(
             header::CACHE_CONTROL,
             "public, s-maxage=7200, max-age=0, stale-while-revalidate",
@@ -77,7 +77,7 @@ mod test {
     }
 
     #[test]
-    fn it_should_200() {
+    fn it_should_fail() {
         let resp = handler(
             Request::builder()
                 .uri("/abc123")
@@ -85,7 +85,7 @@ mod test {
                 .unwrap()
         );
 
-        assert_eq!(resp.unwrap().status(), StatusCode::OK);
+        assert_eq!(resp.unwrap().status(), StatusCode::NOT_FOUND);
     }
 
     #[test]
