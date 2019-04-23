@@ -8,6 +8,7 @@ fn handler(request: Request<()>) -> http::Result<Response<String>> {
     let mut map: HashMap<&'static str, &'static str> = HashMap::new();
     map.insert("twitter", "https://twitter.com/codervandal");
     map.insert("github", "https://github.com/maraisr");
+    map.insert("paypal", "https://www.paypal.me/maraisr");
 
     if cfg!(test) {
         map.insert("test_key", "test_url");
@@ -23,7 +24,7 @@ fn handler(request: Request<()>) -> http::Result<Response<String>> {
             .header(header::LOCATION, *point_to)
             .header(
                 header::CACHE_CONTROL,
-                "public, s-maxage=43200, max-age=43200, stale-while-revalidate",
+                "public, s-maxage=43200, max-age=0, stale-while-revalidate",
             )
             .header(
                 header::CONTENT_TYPE,
