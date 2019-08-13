@@ -25,7 +25,7 @@ fn handler(request: Request<()>) -> http::Result<Response<String>> {
             .header(header::LOCATION, *point_to)
             .header(
                 header::CACHE_CONTROL,
-                "public, s-maxage=43200, max-age=0, stale-while-revalidate",
+                "public, s-maxage=43200, max-age=7200, stale-while-revalidate",
             )
             .header(
                 header::CONTENT_TYPE,
@@ -40,7 +40,7 @@ fn handler(request: Request<()>) -> http::Result<Response<String>> {
         .status(StatusCode::NOT_FOUND)
         .header(
             header::CACHE_CONTROL,
-            "public, s-maxage=7200, max-age=0, stale-while-revalidate",
+            "public, s-maxage=7200, max-age=7200, stale-while-revalidate",
         )
         .header(
             header::CONTENT_TYPE,
