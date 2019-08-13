@@ -9,6 +9,7 @@ fn handler(request: Request<()>) -> http::Result<Response<String>> {
     map.insert("twitter", "https://twitter.com/codervandal");
     map.insert("github", "https://github.com/maraisr");
     map.insert("paypal", "https://www.paypal.me/maraisr");
+    map.insert("coffee", "https://www.buymeacoffee.com/marais");
 
     if cfg!(test) {
         map.insert("test_key", "test_url");
