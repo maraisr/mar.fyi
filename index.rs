@@ -11,6 +11,7 @@ fn handler(request: Request<()>) -> http::Result<Response<String>> {
     map.insert("paypal", "https://www.paypal.me/maraisr");
     map.insert("coffee", "https://www.buymeacoffee.com/marais");
     map.insert("dev", "https://dev.to/marais");
+    map.insert("in", "https://www.linkedin.com/in/maraisr/");
 
     if cfg!(test) {
         map.insert("test_key", "test_url");
